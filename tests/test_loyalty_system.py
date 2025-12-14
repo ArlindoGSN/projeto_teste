@@ -191,3 +191,28 @@ def test_ranking_clientes_por_pontos():
     system.add_customer(Customer("C", points=20))
     ranking = system.sort_customers_by_points()
     assert [c.name for c in ranking] == ["B", "C", "A"]
+
+
+# 24
+def test_manter_pontos_validos_apos_expiracao():
+    system = LoyaltySystem()
+    customer = Customer("Ana")
+
+    customer.history = [
+        {"points": 20, "date": datetime.now() - timedelta(days=40)},  # expira
+        {"points": 30, "date": datetime.now() - timedelta(days=10)},  # válido
+    ]
+    customer.points = 50
+
+    system.add_customer(customer)
+
+    system.expire_old_points(30)
+
+    # Apenas os pontos válidos permanecem
+    assert system.get_points("Ana") == 30
+
+
+# 25
+def test_criar_cliente_sem_nome_lanca_excecao():
+    with pytest.raises(ValueError):
+        Customer("")
